@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     private var buttonDivide: Button? = null
     private var buttonEquals: Button? = null
     private var buttonClr: Button? = null
+    private var buttonDot: Button? = null
 
     private var ans: Double = 0.0
     private var operator: Char? = null
@@ -101,6 +102,9 @@ class MainActivity : AppCompatActivity() {
 
         buttonMinus = findViewById(R.id.buttonMinus)
         buttonMinus?.setOnClickListener {
+//            if((mode == '-') && (operator == "-")){
+//                mode = '+'
+//            }
             updateTotal('-')
         }
 
@@ -112,6 +116,11 @@ class MainActivity : AppCompatActivity() {
         buttonDivide = findViewById(R.id.buttonDivide)
         buttonDivide?.setOnClickListener {
             updateTotal('/')
+        }
+
+        buttonDot = findViewById(R.id.buttondot)
+        buttonDot?.setOnClickListener {
+            addDecimal()
         }
 
         buttonEquals = findViewById(R.id.buttonEquals)
@@ -132,17 +141,28 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun addDecimal(){
+        term?.let {
+            if(!(it.endsWith(".") || it.endsWith("-") || it.endsWith("+") || it.endsWith("/") || it.endsWith("*"))){
+                term += "."
+                displayText += "."
+                display?.text = displayText
+                println("addDecimal exec\nterm : $term, displayText : $displayText\n\n")
+            }
+        }
+
+    }
+
     private fun updateTerm(digit: String){
         println("UpdateTerm exec\nterm : $term, digit pressed : $digit\n\n")
         if(term == null){
             term = digit
-//            displayText += digit
+            displayText += digit
         }else {
             term += digit
-//            displayText += digit
+            displayText += digit
         }
-//        display?.text = displayText
-        display?.append(digit)
+        display?.text = displayText
     }
 
     private fun updateTotal(op: Char){
@@ -181,7 +201,11 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-            mode = operator
+            mode = if((term == null) && (mode == '-') && (operator == '-')){
+                '+'
+            }else{
+                operator
+            }
             operator = null
             term = null
 
@@ -195,16 +219,25 @@ class MainActivity : AppCompatActivity() {
         }
 
         if(op != '='){
-//            displayText += op
-//            display?.text = displayText
-            display?.append(op.toString())
+            displayText += op
+            display?.text = displayText
+//            display?.append(op.toString())
         }else{
-//            displayText = ans.toString()
-            display?.text = ans.toString()
+
+            displayText = removeZero(ans.toString())
+            display?.text = displayText
             operator = null
             mode = null
             term = null
             return
         }
+    }
+
+    private fun removeZero(result: String): String{
+        var value = result
+        if(value.contains(".0")){
+            value =  value.substring(0, value.length - 2)
+        }
+        return value
     }
 }
